@@ -32,7 +32,8 @@ function checkInput() {
             guessCount++;
             if (inputField.value == randomNumber) {
                 document.querySelector('.number').textContent = randomNumber;
-                document.querySelector('.body').style.backgroundColor = "green";
+                document.querySelector('.body').style.backgroundColor = "#60b347";
+                document.querySelector('.number').style.width = '30rem';
                 scoreValue.textContent = score;
                 highScore.push(guessCount);
                 document.querySelector('.highscore').textContent = Math.min(...highScore)
