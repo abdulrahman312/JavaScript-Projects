@@ -1,7 +1,8 @@
 'use strict';
 
-let playerOneData = 0;
-let playerTwoData = 0;
+let playerData = [0, 0];
+let currentScore = 0;
+let activePlayer = 0;
 let playerOne = document.querySelector('.player--0');
 let playerTwo = document.querySelector('.player--1');
 let playerOneScore = document.querySelector('#score--0');
@@ -15,6 +16,7 @@ document.querySelector('.btn--new').addEventListener('click', initializeGame);
 
 
 function switchPlayer() {
+    (activePlayer == 0) ? activePlayer = 1 : activePlayer = 0;
     playerOneCurrentScore.textContent = 0;
     playerTwoCurrentScore.textContent = 0;
     playerOne.classList.toggle("player--active");
@@ -22,10 +24,10 @@ function switchPlayer() {
 }
 
 function initializeGame() {
+    diceImg.classList.add('hidden');
     playerOneScore.textContent = 0;
     playerTwoScore.textContent = 0;
-    playerOneCurrentScore.textContent = 0;
-    playerTwoCurrentScore.textContent = 0;
+    playerData = [0, 0];
     if(!playerOne.classList.contains('player--active')) {
         switchPlayer();
     }
@@ -40,49 +42,29 @@ function initializeGame() {
 function rollDice() {
     let randomNumber = Math.floor(Math.random() * 6) + 1;
     diceImg.setAttribute("src", `dice-${randomNumber}.png`);
-    if (playerOne.classList.contains('player--active')) {
-        if (randomNumber == 1) {
-            playerOneData += Number(playerOneCurrentScore.textContent);
-            playerOneScore.textContent = playerOneData;
-            switchPlayer();
-        } else {
-            playerOneCurrentScore.textContent = Number(playerOneCurrentScore.textContent) + randomNumber;
-            if ((Number(playerOneCurrentScore.textContent) + playerOneData) >= 100) {
-                playerOneScore.textContent = Number(playerOneCurrentScore.textContent) + playerOneData;
-                playerOne.classList.add('player--winner');
-                winGame();
-            }
-        }    
+    diceImg.classList.remove('hidden');
+    if (randomNumber == 1) {
+        currentScore = 0;
+        switchPlayer();
     } else {
-        if (randomNumber == 1) {
-            playerTwoData += Number(playerTwoCurrentScore.textContent);
-            playerTwoScore.textContent = playerTwoData;
-            switchPlayer();
-        } else {
-            playerTwoCurrentScore.textContent = Number(playerTwoCurrentScore.textContent) + randomNumber;
-            if ((Number(playerTwoCurrentScore.textContent) + playerTwoData) >= 100) {
-                playerTwoScore.textContent = Number(playerTwoCurrentScore.textContent) + playerTwoData;
-                playerTwo.classList.add('player--winner');
-                winGame();
-            }
-        } 
+        currentScore += randomNumber;
+        document.querySelector(`#current--${activePlayer}`).textContent = currentScore;
+        if (currentScore + playerData[activePlayer] >= 10) {
+            document.querySelector(`#score--${activePlayer}`).textContent = currentScore + playerData[activePlayer];
+            winGame();
+        }
     }
 }
 
 // This function will run when the game is hold
 function holdGame() {
-    if (playerOne.classList.contains('player--active')) {
-        playerOneData += Number(playerOneCurrentScore.textContent);
-        playerOneScore.textContent = playerOneData;
-    } else {
-        playerTwoData += Number(playerTwoCurrentScore.textContent);
-        playerTwoScore.textContent = playerTwoData;
-    }
+    document.querySelector(`#score--${activePlayer}`).textContent = currentScore + playerData[activePlayer];
     switchPlayer();
 }
 
 // This function will run when the game is finished
 function winGame() {
+    document.querySelector(`.player--${activePlayer}`).classList.add('player--winner');
     document.querySelector('.btn--roll').removeEventListener('click', rollDice);
     document.querySelector('.btn--hold').removeEventListener('click', holdGame);
 }
