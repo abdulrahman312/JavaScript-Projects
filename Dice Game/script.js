@@ -49,7 +49,7 @@ function rollDice() {
     } else {
         currentScore += randomNumber;
         document.querySelector(`#current--${activePlayer}`).textContent = currentScore;
-        if (currentScore + playerData[activePlayer] >= 10) {
+        if (currentScore + playerData[activePlayer] >= 100) {
             document.querySelector(`#score--${activePlayer}`).textContent = currentScore + playerData[activePlayer];
             winGame();
         }
