@@ -266,3 +266,5 @@ dotContainer.addEventListener('click', function (e) {
 
 }
 slider();
+
+
