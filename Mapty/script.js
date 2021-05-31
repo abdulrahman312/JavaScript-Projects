@@ -11,6 +11,47 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+class Workout {
+    date = new Date();
+    id = (Date.now() + '').slice(-10);
+
+    constructor(coords, duration, distance) {
+        this.coords = coords;     // [lat, lng]
+        this.duration = duration; // in km
+        this.distance = distance; // in min
+    }
+}
+
+class Running extends Workout {
+    constructor(coords, duration, distance, cadance) {
+        super(coords, duration, distance);
+        this.cadance = cadance;
+        this.calcPace();
+    }
+
+    calcPace() {
+        // distance/duration
+        this.pace = this.distance / this.duration;
+        return this.pace;
+    }
+}
+
+class Cycling extends Workout {
+    constructor(coords, duration, distance, elevationGain) {
+        super(coords, duration, distance);
+        this.elevationGain = elevationGain;
+        this.calcSpeed();
+    }
+
+    calcSpeed() {
+        // km/h
+        this.speed = this.distance / (this.duration / 60)
+        return this.speed;
+    }
+}
+
+
+// Application Architecture
 class App {
     #map;
     #mapEvent;
@@ -46,7 +87,7 @@ class App {
         }).addTo(this.#map);
     
         L.marker(coords).addTo(this.#map)
-            .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+            .bindPopup('Your current location')
             .openPopup();
     
         // Handling clicks on map
