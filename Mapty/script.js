@@ -67,12 +67,15 @@ class App {
     #mapEvent;
     #workouts = [];
     constructor() {
+        // Get user position
         this._getPosition();
 
-        form.addEventListener('submit', this._newWorkout.bind(this));
-        
-        inputType.addEventListener('change', this._toggleElevationField);
+        // Get data from local storage
+        this._getLocalStorage();
 
+        // Attach event handlers
+        form.addEventListener('submit', this._newWorkout.bind(this));
+        inputType.addEventListener('change', this._toggleElevationField);
         containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     }
 
@@ -99,12 +102,16 @@ class App {
             attribution: '&copy; <a href="https://www.openstreetmap.fr/hot/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.#map);
     
-        L.marker(coords).addTo(this.#map)
-            .bindPopup('Your current location')
-            .openPopup();
+        // L.marker(coords).addTo(this.#map)
+        //     .bindPopup('Your current location')
+        //     .openPopup();
     
         // Handling clicks on map
         this.#map.on('click', this._showForm.bind(this))
+
+        this.#workouts.forEach(work => {
+            this._renderWorkoutMarker(work);
+        })
     }
 
     _showForm(mapE) {
@@ -171,6 +178,9 @@ class App {
 
         // Clear form input fields
         this._hideForm();
+
+        // Set local storage to all workouts
+        this._setLocalStorage();
     }
 
     _renderWorkoutMarker(workout) {
@@ -190,6 +200,8 @@ class App {
         let html = `
             <li class="workout workout--${workout.type}" data-id="${workout.id}">
                 <h2 class="workout__title">${workout.description}</h2>
+                <span class="edit__workout">Edit </span>
+                <span class="delete__workout">Delete</span>
                 <div class="workout__details">
                 <span class="workout__icon">${
                     workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
@@ -238,8 +250,15 @@ class App {
 
     _moveToPopup(e) {
         const workoutEl = e.target.closest('.workout');
-
+        // If clicked outside list items
         if (!workoutEl) return;
+
+        if (e.target.className === 'delete__workout') {
+            this.#workouts = this.#workouts.filter(work => work.id !== workoutEl.dataset.id);
+            workoutEl.remove();
+            this._setLocalStorage();
+            return;
+        }
 
         const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
 
@@ -249,6 +268,28 @@ class App {
                 duration: 1,
             },
         })
+    }
+
+    _setLocalStorage() {
+        localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+    }
+
+    _getLocalStorage() {
+        const data = JSON.parse(localStorage.getItem('workouts'));
+        
+        if (!data) return;
+
+        this.#workouts = data;
+
+        this.#workouts.forEach(work => {
+            this._renderWorkout(work);
+        })
+
+    }
+
+    reset() {
+        localStorage.removeItem('workouts');
+        location.reload();
     }
 }
 
