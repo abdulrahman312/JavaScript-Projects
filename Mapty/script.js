@@ -260,6 +260,10 @@ class App {
             return;
         }
 
+        if (e.target.className === 'edit__workout') {
+            this._editWorkout(workoutEl.dataset.id);
+        }
+
         const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
 
         this.#map.setView(workout.coords, this.#mapZoomLevel, {
@@ -268,6 +272,21 @@ class App {
                 duration: 1,
             },
         })
+    }
+
+    _editWorkout(id) {
+        // Get the workout
+        const workoutToEdit = this.#workouts.find(work => work.id === id);
+        console.log(workoutToEdit);
+
+        // Show form with all values
+        form.classList.remove('hidden');
+        inputDistance.value = workoutToEdit.distance;
+        inputDuration.value = workoutToEdit.duration;
+        if (workoutToEdit.type === 'running')
+            inputCadence.value = workoutToEdit.cadence;
+        if (workoutToEdit.type === 'cycling')
+            inputElevation.value = workoutToEdit.elevationGain;
     }
 
     _setLocalStorage() {
